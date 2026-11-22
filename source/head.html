@@ -106,6 +106,23 @@
   .palette { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 8px; }
   .palette button { font-size: 12px; padding: 5px 4px; min-height: 30px; }
   .big { width: 100%; min-height: 42px; font-size: 14px; }
+  .swatches { display: flex; flex-wrap: wrap; gap: 5px; }
+  .sw { width: 26px; height: 26px; min-height: 26px; padding: 0; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--line); cursor: pointer; position: relative; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; color: var(--muted); background: #fff; }
+  .sw.on { box-shadow: 0 0 0 2px var(--accent); }
+  .sw.custom { background: conic-gradient(#e07a5f, #f2cc8f, #81b29a, #3d8bbd, #9b72cf, #e07a5f); }
+  .sw.custom input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; border: 0; padding: 0; }
+  .floors { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+  .floors button { padding: 0; min-height: 0; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; background: #fff; }
+  .floors button i { display: block; height: 34px; background-size: cover; }
+  .floors button span { font-size: 10.5px; padding: 2px 3px 3px; line-height: 1.15; color: var(--ink); }
+  .floors button[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--accent); border-color: var(--accent); }
+  #walkPad { position: fixed; right: 16px; bottom: 16px; display: none; grid-template-columns: repeat(3, 48px); grid-template-rows: repeat(2, 48px); gap: 6px; z-index: 6; }
+  body.walking #walkPad { display: grid; }
+  #walkPad button { background: rgba(255,255,255,.9); font-size: 18px; min-height: 48px; border-radius: 12px; touch-action: none; user-select: none; -webkit-user-select: none; }
+  #walkHint { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); background: rgba(31,42,51,.88); color: #fff; padding: 7px 14px; border-radius: 18px; font-size: 12.5px; display: none; z-index: 6; pointer-events: none; white-space: nowrap; }
+  body.walking #walkHint { display: block; }
+  body.wide #walkHint { left: calc(50% + (var(--pw) + 12px) / 2); }
+  @media (max-width: 820px) { #walkPad { bottom: auto; top: 60px; right: 10px; } #walkHint { white-space: normal; max-width: 80vw; text-align: center; } }
   .calib { background: var(--accent-soft); border: 1px solid #bcd3ea; border-radius: 10px; padding: 10px; margin-top: 8px; }
 
   /* upload card */
@@ -304,6 +321,7 @@
           <button id="topBtn">Plan view</button>
         </div>
         <div class="bar"><i id="tourProg"></i></div>
+        <button id="walkBtn" style="width:100%;margin-top:8px" aria-pressed="false">🚶 Walk through at eye level</button>
       </section>
       <section>
         <h2>Display</h2>
@@ -315,6 +333,20 @@
           <button id="furnBtn" aria-pressed="true">Furniture</button>
           <button id="doorBtn" aria-pressed="true">Doors open</button>
         </div>
+        <label class="f" style="margin:10px 0 0"><span>Time of day <span class="note" id="hourLbl">2:00 pm</span></span><input id="hour" type="range" min="6" max="20" step="0.25" value="14"></label>
+      </section>
+      <section>
+        <h2>Decorate</h2>
+        <label class="f"><span>Room</span><select id="decRoom"></select></label>
+        <div class="note" style="margin:0 0 5px">Floor</div>
+        <div class="floors" id="floorSw"></div>
+        <div class="note" style="margin:10px 0 5px">Wall paint</div>
+        <div id="wallSw"></div>
+        <div class="grid" style="margin-top:10px">
+          <button id="artBtn">Hang paintings</button>
+          <button id="shuffleBtn">Shuffle art</button>
+        </div>
+        <p class="note">To move a painting, change its size, frame or picture, or hang your own photo, select it in the editor.</p>
       </section>
       <section>
         <h2>Rooms</h2>
@@ -333,7 +365,7 @@
         <h2>Controls</h2>
         <p class="note" style="margin-top:0">Drag to rotate, scroll or pinch to zoom, right-drag or two-finger drag to pan.<br>
         <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd> rotate · <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> pan · <kbd>+</kbd><kbd>−</kbd> zoom<br>
-        <kbd>T</kbd> tour · <kbd>O</kbd> overview · <kbd>P</kbd> plan view · <kbd>C</kbd> cutaway · <kbd>N</kbd> night · <kbd>L</kbd> labels · <kbd>1</kbd>–<kbd>9</kbd> rooms · <kbd>E</kbd> editor</p>
+        <kbd>T</kbd> tour · <kbd>O</kbd> overview · <kbd>P</kbd> plan view · <kbd>C</kbd> cutaway · <kbd>N</kbd> night · <kbd>L</kbd> labels · <kbd>1</kbd>–<kbd>9</kbd> rooms · <kbd>E</kbd> editor · <kbd>K</kbd> walk</p>
       </section>
     </div>
   </div>
@@ -345,6 +377,11 @@
   <button id="zFit">Fit</button>
 </div>
 <div id="hint" role="status" aria-live="polite"></div>
+<div id="walkPad" aria-label="Walk controls">
+  <span></span><button data-k="w" aria-label="Forward">▲</button><span></span>
+  <button data-k="arrowleft" aria-label="Turn left">⟲</button><button data-k="s" aria-label="Back">▼</button><button data-k="arrowright" aria-label="Turn right">⟳</button>
+</div>
+<div id="walkHint">Drag to look around · W A S D or arrows to walk · Shift to hurry · Esc to stop</div>
 <div id="busy"><div id="busyTxt">Working…</div></div>
 
 <dialog id="jsonDlg">

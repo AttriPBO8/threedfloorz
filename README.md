@@ -11,6 +11,11 @@ Open `index.html` in a modern browser (Chrome, Edge, Firefox, Safari). No instal
 1. **Plan**: drop in a PNG, JPG, WebP, GIF or PDF (or try the built-in sample).
 2. **Edit**: the app detects walls, doors (with hinge and swing), windows and rooms, and reads room names and areas printed on the plan. Fix anything with the tools (wall, door, window, room, stairs, furniture, light, measure, erase), set the scale from the overall width or a known length, and use **Auto-furnish** to furnish rooms by name.
 3. **3D view**: camera tour, overview, plan view, cutaway walls, night lights, room labels, plan overlay, furniture and door toggles, room fly-to, layout JSON editor, project save and screenshot.
+4. **Decorate** (in the 3D view): pick a room or the whole home and change the floor (oak, maple, walnut, parquet, white or black marble, terrazzo, stone or bathroom tile, slate, carpet, polished concrete) and the wall paint (13 colours or any colour). **Hang paintings** puts procedural art above sofas and beds and on free walls; **Shuffle art** re-rolls it. In the editor, select a painting to change its art style, frame, size and hang height, or use your own photo.
+5. **Walk through** at eye level: drag to look, W A S D or arrows to walk (on-screen pad on phones); walls and furniture are solid.
+6. **Time of day**: move the sun from sunrise to sunset and watch the light and shadows change.
+
+![Walk-through with wall paint and paintings](docs/preview-walk.png)
 
 ![Editor](docs/preview-editor.png)
 
